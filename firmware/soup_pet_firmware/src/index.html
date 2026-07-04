@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Soup Control Panel</title>
+    <style>
+        body {
+          background-color: #F1E3D7;
+          color: #8C6665;
+        }
+
+        button {
+          color: #8C6665;
+        }
+
+        fieldset {
+          border: #8C6665 0px solid;
+          background: #DAC5BA;
+        }
+        
+        legend {
+          background: #8C6665;
+          color: #ffffff;
+          padding: 3px 15px 3px 15px;
+        }
+
+        #lr-angle, #ud-angle {
+          pointer-events: none;
+          outline: none;
+          width: 50px;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>Soup the Shoulder Pet</h1>
+
+    <p>welcome to the soup control panel. you can <i>try</i> to control soup here.</p>
+
+    <span>angry level</span>
+    <progress id="angry level" value="32" max="100"></progress>
+
+    <br />
+
+    <span>mischievious level</span>
+    <progress id="mischievious level" value="3" max="100"></progress>
+
+    <br />
+    <br />
+
+    <fieldset>
+      <legend>Scheduling</legend>
+
+      <div>
+        <input type="checkbox" id="scheduled" name="scheduled" checked />
+        <label for="scheduled">Schedule random stuff</label>
+      </div>
+
+    </fieldset>
+
+    <br />
+
+    <fieldset>
+      <legend>Configuration</legend>
+
+      <div>
+        <input type="checkbox" id="ai" name="ai" checked />
+        <label for="ai">Autonomous Soup</label>
+      </div>
+
+      <div>
+        <input type="checkbox" id="foobar" name="foobar" />
+        <label for="foobar">foobar</label>
+      </div>
+
+    </fieldset>
+
+    <br />
+
+    <fieldset>
+      <legend>Debug (read only)</legend>
+
+      <div>
+        <input type="checkbox" id="touch1" name="touch1" checked />
+        <label for="touch1">Touch Sensor Triggered</label>
+      </div>
+
+      <div>
+        <input type="number" id="lr-angle" name="lr-angle" value="20.3" />
+        <label for="lr-angle">Left-Right Angle</label>
+      </div>
+
+      <div>
+        <input type="number" id="ud-angle" name="ud-angle" value="3.9" />
+        <label for="ud-angle">Up-Down Angle</label>
+      </div>
+
+    </fieldset>
+
+    <br />
+
+    <fieldset>
+      <legend>Testing</legend>
+
+      <div>
+        <button onclick="sendMessage('dsoup');">Delete Soup</button>
+        <button onclick="sendMessage('sdestruct');">Self Destruct</button>
+      </div>
+
+    </fieldset>
+  </body>
+
+  <script>
+    var ws = new WebSocket('ws://192.168.4.1/ws');
+    ws.onopen = function() {
+      console.log("WebSocket connected");
+    };
+    ws.onclose = function() {
+      console.log("WebSocket closed");
+    };
+    ws.onerror = function(error) {
+      console.log("WebSocket error: " + error);
+    };
+
+    ws.onmessage = function(event) { // handle this <---------------------------
+      console.log("WebSocket message: " + event.data);
+    };
+
+    function sendMessage(message) {
+      console.log("WebSocket sent: " + message);
+      ws.send(message);
+    }
+  </script>
+</html>

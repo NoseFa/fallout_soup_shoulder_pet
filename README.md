@@ -10,7 +10,6 @@ The main Soup model was created in Blender and the parts on the inside were fini
 
 The CAD was made more as a reference and made so we could get all the 3D printed parts instead of it being a fully completed design. The inside of soup including attaching the servos and head etc. were made with just cardboard and hot glue because it was fast and good enough for a Hackathon project. You can find the full project files as a Fusion assembly in the [´/3dFiles/Fullproject´](./3dFiles/Fullproject/) folder. It's available as a .f3z and a .step file. 
 
-
 ## Zine page 
 
 Coming soon!

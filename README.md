@@ -2,7 +2,7 @@
 
 by the LDO team
 
-[!3d render](./media/3DRender.png)
+![3d render](./media/3DRender.png)
 
 This project was created for the in person at the 7-day Fallout hackathon in Shenzhen, China. It was ran by Hack Club. The project was inspired by how pikachu sits on Ash's shoulder in the Pokémon animated series. Soup is the mascot of the Fallout hackathon so we thought it would be cool to stay on theme and try to make a robot that replicates the feeling and look of having a friend like Pikachu on your shoulder.
 

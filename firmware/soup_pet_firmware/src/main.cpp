@@ -1,32 +1,115 @@
 #include <Arduino.h>
+
 #include <AsyncTCP.h>
 #include <WiFi.h>
-
 #include <ESPAsyncWebServer.h>
+
+#include <TaskScheduler.h>
+
+#include <ESP32Servo.h>
+
+
+#define TOUCH_PIN 43
+#define SERVO_X_PIN 6
+// D10 GPIO9 broooooooooooooooooooooo
+#define SERVO_Y_PIN 8
+// D9 GPIO8
+
+
+Scheduler runner;
+
+Servo servoX;
+Servo servoY;
+
+int xPos = 0;
+int yPos = 0;
+
+int movementStep = 5;
+
+bool isTouchingHead = false;
+bool isTouchingHeadOld = isTouchingHead;
 
 
 // idk find a better way to laod the html file
 // https://stackoverflow.com/questions/2602013/read-whole-ascii-file-into-c-stdstring
-static const char *htmlContent PROGMEM = R"(
 
-)";
+extern const uint8_t html_start[] asm("_binary_src_index_html_start");
+extern const uint8_t html_end[] asm("_binary_src_index_html_end");
 
-static const size_t htmlContentLength = strlen_P(htmlContent);
+//static const size_t htmlContentLength = strlen_P(htmlContent);
 
 static AsyncWebServer server(80);
 static AsyncWebSocket ws("/ws");
 
+int testNum = 0;
+void test() {
+  Serial.print(testNum);
+  Serial.print(") go. http://");
+  Serial.println(WiFi.softAPIP());
+  testNum = testNum + 1;
+}
+Task taskTest(10000, TASK_FOREVER, &test);
+
+void moveX(int xunf) {
+  int x = xunf;
+  if (xunf > 180) {
+    x = 180;
+  } else if (xunf < 0) {
+    x = 0;
+  }
+
+  servoX.write(x);
+  String str = "servoX-" + String(x);
+  xPos = x;
+  ws.textAll(str);
+  Serial.println(str);
+}
+
+void moveY(int yunf) {
+  int y = yunf;
+  if (yunf > 180) {
+    y = 180;
+  } else if (yunf < 0) {
+    y = 0;
+  }
+
+  servoY.write(y);
+  String str = "servoY-" + String(y);
+  yPos = y;
+  ws.textAll(str);
+  Serial.println(str);
+}
+
 void setup() {
+
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+
   Serial.begin(115200);
 
+  // setup pinout
+  pinMode(TOUCH_PIN, INPUT);
+
+  servoX.setPeriodHertz(50);
+  servoX.attach(SERVO_X_PIN, 500, 2400);
+
+  servoY.setPeriodHertz(50);
+  servoY.attach(SERVO_Y_PIN, 500, 2400);
+
+  // task scheduler
+  runner.addTask(taskTest);
+  taskTest.enable();
+
+
   // setup wifi connection for local webpanel
-  #if ASYNCWEBSERVER_WIFI_SUPPORTED
-    WiFi.mode(WIFI_AP);
-    WiFi.softAP("esp-captive");
-  #endif
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP("souppp");
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "text/html", (uint8_t *)htmlContent, htmlContentLength);
+    size_t length = html_end - html_start;
+    request->send(200, "text/html", (uint8_t *)html_start, length);
   });
 
   ws.onEvent([](AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
@@ -45,6 +128,37 @@ void setup() {
         info->message_opcode, len
       );
 
+      data[len] = 0;
+      String message = (char*)data;
+      
+      Serial.print("Received Message: ");
+      Serial.println(message);
+
+      if (message == "sdestruct") {
+        for (int i = 0; i < 15; i++) {
+          moveX(0);
+          delay(50);
+          moveX(180);
+          delay(50);
+        }
+      }
+      if (message == "stepL") {
+        moveX(xPos - movementStep);
+      }
+      if (message == "stepR") {
+        moveX(xPos + movementStep);
+      }
+      if (message == "stepU") {
+        moveY(yPos + movementStep);
+      }
+      if (message == "stepD") {
+        moveY(yPos - movementStep);
+      }
+      if (message == "normal") {
+        moveX(90);
+        moveY(90);
+      }
+
       //todo handling messages
     }
   });
@@ -55,5 +169,31 @@ void setup() {
 }
 
 void loop() {
-  delay(100);
+  runner.execute();
+
+
+
+  // sensor readings
+  if (digitalRead(TOUCH_PIN) == HIGH) {
+    isTouchingHead = true;
+    moveX(0);
+    delay(150);
+    moveX(180);
+    delay(150);
+
+  } else {
+    isTouchingHead = false;
+  }
+  
+  if (isTouchingHead != isTouchingHeadOld) {
+    Serial.println("touch head change detected");
+    if (isTouchingHead) {
+      ws.textAll("hTouch-true");
+      Serial.println("hTouch-true");
+    } else {
+      ws.textAll("hTouch-false");
+      Serial.println("hTouch-false");
+    }
+    isTouchingHeadOld = isTouchingHead;
+  }
 }

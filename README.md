@@ -21,7 +21,7 @@ Ever needed comfort in the times of a nuclear war? Having a pet on your shoulder
 
 The main Soup model was created in Blender and the parts on the inside were finished in Fusion. The cad files attached are pretty simple and have stuff like the servos just floating and not attached to the main body. 
 
-The CAD was made more as a reference and made so we could get all the 3D printed parts instead of it being a fully completed design. The inside of soup including attaching the servos and head etc. were made with just cardboard and hot glue because it was fast and good enough for a Hackathon project. You can find the full project files as a Fusion assembly in the [`./3D/Cad/`](./3D/Cad/) folder. It's available as a .f3z and a .step file. 
+The CAD was made more as a reference and made so we could get all the 3D printed parts instead of it being a fully completed design. The inside of soup including attaching the servos and head etc. were made with just cardboard and hot glue because it was fast and good enough for a Hackathon project. You can find the full project files as a Fusion assembly in the [`./3D/Cad/`](./3D/Cad/) folder. It's available as a .f3z and a .step file. The .f3z file is in google drive because it's too large to be submitted to GitHub. You can find it on [google drive](https://drive.google.com/file/d/1EYZ_N3Z-h-YQkgZ7TEGKQ9iQ8ZLq4Vvb/view?usp=sharing).
 
 ![3d render](./media/3DRender.png)
 

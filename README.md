@@ -4,6 +4,10 @@ by the LDO team
 
 This project was created for the in person at the 7-day Fallout hackathon in Shenzhen, China. It was ran by Hack Club. The project was inspired by how pikachu sits on Ash's shoulder in the Pokémon animated series. Soup is the mascot of the Fallout hackathon so we thought it would be cool to stay on theme and try to make a robot that replicates the feeling and look of having a friend like Pikachu on your shoulder.
 
+## Purpose
+
+Ever needed comfort in the times of a nuclear war? Having a pet on your shoulder would provide the comfort needed in dire situations and give comfort. Soup is also a great companion. 
+
 ## Features
 
 - Moving head
@@ -18,6 +22,8 @@ The main Soup model was created in Blender and the parts on the inside were fini
 The CAD was made more as a reference and made so we could get all the 3D printed parts instead of it being a fully completed design. The inside of soup including attaching the servos and head etc. were made with just cardboard and hot glue because it was fast and good enough for a Hackathon project. You can find the full project files as a Fusion assembly in the [`/3dFiles/Fullproject`](./3dFiles/Fullproject/) folder. It's available as a .f3z and a .step file. 
 
 ![3d render](./media/3DRender.png)
+
+![alt text](./media/image.png)
 
 
 ## Firmware
@@ -43,7 +49,14 @@ The Zine page is also available as a pdf.
 
 
 
+## bom
 
+|Part                     |Description      |Quantity|
+|-------------------------|-----------------|--------|
+|Seeed XIAO ESP32-S3 Sense|microcontroller  |1       |
+|SG90 Servo               |for rotation axis|2       |
+|Touch Sensor             |                 |1       |
+|Jumper Cables            |                 |a lot   |
 
 
 `soup`

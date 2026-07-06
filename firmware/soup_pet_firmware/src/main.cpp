@@ -8,11 +8,14 @@
 
 #include <ESP32Servo.h>
 
+#include "esp_camera.h"
+#include "camera_pins.h"
+
 
 #define TOUCH_PIN 43
 #define SERVO_X_PIN 6
 // D10 GPIO9 broooooooooooooooooooooo
-#define SERVO_Y_PIN 8
+#define SERVO_Y_PIN 5
 // D9 GPIO8
 
 
@@ -39,7 +42,7 @@ extern const uint8_t html_end[] asm("_binary_src_index_html_end");
 //static const size_t htmlContentLength = strlen_P(htmlContent);
 
 static AsyncWebServer server(80);
-static AsyncWebSocket ws("/ws");
+AsyncWebSocket ws("/ws");
 
 int testNum = 0;
 void test() {
@@ -69,8 +72,8 @@ void moveY(int yunf) {
   int y = yunf;
   if (yunf > 180) {
     y = 180;
-  } else if (yunf < 0) {
-    y = 0;
+  } else if (yunf < 45) {
+    y = 45;
   }
 
   servoY.write(y);
@@ -87,6 +90,8 @@ void setup() {
   ESP32PWM::allocateTimer(2);
   ESP32PWM::allocateTimer(3);
 
+  setCpuFrequencyMhz(160);
+
   Serial.begin(115200);
 
   // setup pinout
@@ -102,10 +107,13 @@ void setup() {
   runner.addTask(taskTest);
   taskTest.enable();
 
+  camera_init();
 
   // setup wifi connection for local webpanel
   WiFi.mode(WIFI_AP);
   WiFi.softAP("souppp");
+
+  WiFi.setTxPower(WIFI_POWER_11dBm);
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     size_t length = html_end - html_start;
@@ -123,10 +131,10 @@ void setup() {
       Serial.println("ws error");
     } else if (type == WS_EVT_DATA) {
       AwsFrameInfo *info = (AwsFrameInfo *)arg;
-      Serial.printf(
-        "index: %" PRIu64 ", len: %" PRIu64 ", final: %" PRIu8 ", opcode: %" PRIu8 ", framelen: %d\n", info->index, info->len, info->final,
-        info->message_opcode, len
-      );
+      //Serial.printf(
+      //  "index: %" PRIu64 ", len: %" PRIu64 ", final: %" PRIu8 ", opcode: %" PRIu8 ", framelen: %d\n", info->index, info->len, info->final,
+      //  info->message_opcode, len
+      //);
 
       data[len] = 0;
       String message = (char*)data;
@@ -143,20 +151,23 @@ void setup() {
         }
       }
       if (message == "stepL") {
-        moveX(xPos - movementStep);
-      }
-      if (message == "stepR") {
         moveX(xPos + movementStep);
       }
+      if (message == "stepR") {
+        moveX(xPos - movementStep);
+      }
       if (message == "stepU") {
-        moveY(yPos + movementStep);
+        moveY(yPos - movementStep);
       }
       if (message == "stepD") {
-        moveY(yPos - movementStep);
+        moveY(yPos + movementStep);
       }
       if (message == "normal") {
         moveX(90);
         moveY(90);
+      }
+      if (message == "capture") {
+        Serial.println(camera_capture());
       }
 
       //todo handling messages
@@ -171,22 +182,19 @@ void setup() {
 void loop() {
   runner.execute();
 
-
-
   // sensor readings
   if (digitalRead(TOUCH_PIN) == HIGH) {
     isTouchingHead = true;
-    moveX(0);
+    moveX(70);
     delay(150);
-    moveX(180);
+    moveX(50);
     delay(150);
-
   } else {
     isTouchingHead = false;
   }
   
   if (isTouchingHead != isTouchingHeadOld) {
-    Serial.println("touch head change detected");
+    //Serial.println("touch head change detected");
     if (isTouchingHead) {
       ws.textAll("hTouch-true");
       Serial.println("hTouch-true");
@@ -196,4 +204,6 @@ void loop() {
     }
     isTouchingHeadOld = isTouchingHead;
   }
+
+
 }
